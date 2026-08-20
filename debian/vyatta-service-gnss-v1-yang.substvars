@@ -1,0 +1,3 @@
+yang:Depends=configd-v1-yang, vyatta-services-v1-yang
+misc:Depends=
+misc:Pre-Depends=

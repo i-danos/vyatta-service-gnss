@@ -1,0 +1,82 @@
+#!/usr/bin/python3
+
+# Copyright (c) 2021, AT&T Intellectual Property.
+# All rights reserved.
+#
+# SPDX-License-Identifier: LGPL-2.1-only
+
+"""
+Utility to send commands (via ZMQ) to vyatta-gnssd
+"""
+
+import argparse
+import json
+import sys
+import zmq
+
+REP_ENDPOINT = "ipc:///tmp/gnssd_rep.socket"
+
+
+class FailedToConnectToDaemon(Exception):
+    pass
+
+
+def main(parser, args):
+    """
+    Construct a JSON command and send via ZMQ to vyatta-gnssd.
+    """
+
+    if args.get_state:
+        req_json = {
+                'command': 'STATUS'
+                }
+    elif args.stop_gnss:
+        req_json = {
+                'command': 'STOP',
+                'instance': 0,
+                }
+    elif args.start_gnss:
+        req_json = {
+                'command': 'START',
+                'instance': 0,
+                }
+    elif args.shutdown:
+        req_json = {
+                'command': 'SHUTDOWN'
+                }
+    else:
+        parser.print_help()
+        sys.exit(1)
+
+    context = zmq.Context()
+    req_socket = context.socket(zmq.REQ)
+    try:
+        req_socket.connect(REP_ENDPOINT)
+    except Exception as e:
+        raise FailedToConnectToDaemon(f'Connection to gnssd failed: {e}')
+
+    req_socket.send_json(req_json)
+    reply = req_socket.recv_json()
+    if reply.get('result') == 'OK':
+        if args.get_state:
+            state = {'instance-list': reply['data']}
+            print(json.dumps(state))
+        sys.exit(0)
+
+    sys.exit(1)
+
+
+if __name__ == '__main__':
+    arg_parser = argparse.ArgumentParser()
+    group = arg_parser.add_mutually_exclusive_group()
+
+    group.add_argument("--get-state", action='store_true',
+                       help='Get the state of the GNSS devices on the system')
+    group.add_argument("--start-gnss", action='store_true',
+                       help='Start the GNSS device on the system')
+    group.add_argument("--stop-gnss", action='store_true',
+                       help='Stop the GNSS device on the system')
+    group.add_argument("--shutdown", action='store_true',
+                       help='Shutdown the GNSS daemon')
+
+    main(arg_parser, arg_parser.parse_args())

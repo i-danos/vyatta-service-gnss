@@ -1,0 +1,3 @@
+./lib/vyatta/gnss-plugins/UbloxGNSS.py
+./platform/vyatta-service-gnss-ufi-s9500-30xs.platform
+./debian/UbloxGNSS.conf

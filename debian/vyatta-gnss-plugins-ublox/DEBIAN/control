@@ -1,0 +1,11 @@
+Package: vyatta-gnss-plugins-ublox
+Source: vyatta-service-gnss
+Version: 1.13
+Architecture: all
+Maintainer: Vyatta Package Maintainers <DL-vyatta-help@att.com>
+Installed-Size: 49
+Depends: python3, python3-ufispace-bsp-utils, vyatta-service-gnss, python3:any
+Section: contrib/net
+Priority: optional
+Description: Ublox GNSS support on the S9500-30XS platform
+ Provides support for the ublox GNSS device on the S9500-30XS

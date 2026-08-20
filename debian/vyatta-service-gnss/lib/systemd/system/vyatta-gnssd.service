@@ -1,0 +1,14 @@
+[Unit]
+Description=Vyatta GNSS Daemon
+After=vyatta-platform-name.service
+Before=vyatta-dataplane.service
+ConditionPathExists=|/run/vyatta/platform/ufi.s9500-30xs
+
+[Service]
+ExecStart=/opt/vyatta/sbin/vyatta-gnssd
+Restart=on-failure
+User=root
+Group=adm
+
+[Install]
+WantedBy=multi-user.target

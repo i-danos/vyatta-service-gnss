@@ -1,0 +1,3 @@
+yang:Depends=vyatta-service-gnss-v1-yang, vyatta-opd-extensions-v1-yang, vyatta-op-show-v1-yang
+misc:Depends=
+misc:Pre-Depends=

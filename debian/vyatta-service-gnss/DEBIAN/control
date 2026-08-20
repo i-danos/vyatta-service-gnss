@@ -1,0 +1,10 @@
+Package: vyatta-service-gnss
+Version: 1.13
+Architecture: all
+Maintainer: Vyatta Package Maintainers <DL-vyatta-help@att.com>
+Installed-Size: 50
+Depends: python3, python3-systemd, python3-ufispace-bsp-utils (>= 3.0.13-0vyatta8), python3-zmq, python3:any, deb-vci-helper
+Section: contrib/net
+Priority: optional
+Description: GNSS integration and support
+ Provides scripts and files necessary to manage GNSS devices

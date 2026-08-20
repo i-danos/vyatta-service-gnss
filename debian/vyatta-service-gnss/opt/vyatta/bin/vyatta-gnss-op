@@ -1,0 +1,123 @@
+#!/usr/bin/python3
+
+# Copyright (c) 2021, AT&T Intellectual Property.
+# All rights reserved.
+#
+# SPDX-License-Identifier: LGPL-2.1-only
+
+"""
+Interface for the YANG "operational" CLI.
+"""
+
+import datetime
+import sys
+
+from logging import getLogger
+from optparse import OptionParser
+
+from vyatta import configd
+
+
+def show_satellites(satellites):
+    """
+    Print the JSON encoded satellite array.
+    """
+    no_satellites = len(satellites)
+    print('\tsatellites:', no_satellites)
+    if no_satellites:
+        print('\t\tPRN  Elevation  Azimuth  SNR')
+        for satellite in sorted(satellites, key=lambda x: int(x['PRN'])):
+            prn = satellite['PRN']
+            snr = satellite.get('SNR', '-')
+            elevation = satellite.get('elevation', '-')
+            azimuth = satellite.get('azimuth', '-')
+            print(f'\t\t{prn:>3}  {elevation:>9}  {azimuth:>7}  {snr:>3}')
+
+
+def show_instance(instance):
+    """
+    Show the status of a GNSS instance.
+    """
+    print('GNSS {}:'.format(instance['instance-number']))
+    if 'enabled' in instance and not instance['enabled']:
+        print('\t[DISABLED]')
+    if 'antenna-status' in instance:
+        antenna_status = instance['antenna-status']
+        print('\tantenna-status:', "open (or passive antenna)" if antenna_status == 'open' else antenna_status)
+    if 'antenna-delay' in instance:
+        antenna_delay = instance['antenna-delay']
+        print('\tantenna-delay:', antenna_delay, 'ns')
+    if 'tracking-status' in instance:
+        print('\ttracking-status:', instance['tracking-status'])
+    if 'system' in instance:
+        print('\tsystem:', instance['system'])
+    if 'time' in instance:
+        print('\ttime: {} UTC'.format(datetime.datetime.fromtimestamp(instance['time'])))
+    if 'latitude' in instance:
+        print('\tlatitude:', instance['latitude'], 'degrees')
+    if 'longitude' in instance:
+        print('\tlongitude:', instance['longitude'], 'degrees')
+    if 'survey-status' in instance:
+        print('\tsurvey-status:', instance['survey-status'])
+    if 'survey-observations' in instance:
+        print('\tsurvey-observations:', instance['survey-observations'])
+    if 'survey-precision' in instance:
+        print('\tsurvey-precision:', instance['survey-precision'] / 1000.0, 'meters')
+    if 'satellites-in-view' in instance:
+        show_satellites(instance['satellites-in-view'])
+
+
+def show(client):
+    """
+    Show the status of the GNSS instances.
+    """
+    try:
+        tree = client.tree_get_full_dict('service gnss state')
+    except configd.Exception as e:
+        logger.error(f'Retrieving state from configd failed: {e}')
+        sys.exit(1)
+    if 'instance-list' in tree['state']:
+        for instance in tree['state']['instance-list']:
+            show_instance(instance)
+
+
+def start(client):
+    """
+    Call the RPC to start a GNSS device.
+    """
+    client.call_rpc_dict('vyatta-service-gnss-v1',
+                         'start-gnss', {'instance-number': 0})
+
+
+def stop(client):
+    """
+    Call the RPC to stop a GNSS device.
+    """
+    client.call_rpc_dict('vyatta-service-gnss-v1',
+                         'stop-gnss', {'instance-number': 0})
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    logger = getLogger()
+
+    parser = OptionParser()
+    parser.add_option("-a", "--action", help="show|start|stop")
+
+    (options, args) = parser.parse_args()
+
+    if options.action is None:
+        parser.print_usage()
+        sys.exit(1)
+
+    configd_client = configd.Client()
+
+    if options.action == 'show':
+        show(configd_client)
+    elif options.action == 'start':
+        start(configd_client)
+    elif options.action == 'stop':
+        stop(configd_client)
+    else:
+        parser.print_help()
+        sys.exit(1)

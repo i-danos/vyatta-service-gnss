@@ -1,0 +1,7 @@
+vyatta-gnss-plugins-ublox_1.13_all.deb contrib/net optional
+vyatta-op-show-gnss-v1-yang_1.13_all.deb contrib/net optional
+vyatta-op-start-gnss-v1-yang_1.13_all.deb contrib/net optional
+vyatta-op-stop-gnss-v1-yang_1.13_all.deb contrib/net optional
+vyatta-service-gnss-v1-yang_1.13_all.deb contrib/net optional
+vyatta-service-gnss_1.13_all.deb contrib/net optional
+vyatta-service-gnss_1.13_amd64.buildinfo contrib/net optional

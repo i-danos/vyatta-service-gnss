@@ -1,0 +1,11 @@
+Package: vyatta-service-gnss-v1-yang
+Source: vyatta-service-gnss
+Version: 1.13
+Architecture: all
+Maintainer: Vyatta Package Maintainers <DL-vyatta-help@att.com>
+Installed-Size: 22
+Depends: vyatta-service-gnss, configd-v1-yang, vyatta-services-v1-yang
+Section: contrib/net
+Priority: optional
+Description: vyatta-service-gnss-v1 module
+ YANG integration for GNSS configuration

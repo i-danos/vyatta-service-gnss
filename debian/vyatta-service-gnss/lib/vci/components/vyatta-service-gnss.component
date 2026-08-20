@@ -1,0 +1,8 @@
+[Vyatta Component]
+Name=net.vyatta.vci.service.gnss
+Description=VCI component for vyatta-gnssd
+ExecName=/opt/vyatta/sbin/vyatta-gnssd-vci
+
+[Model net.vyatta.vci.service.gnss.v1]
+Modules=vyatta-service-gnss-v1
+ModelSets=vyatta-v1

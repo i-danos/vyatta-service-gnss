@@ -1,0 +1,71 @@
+#!/usr/bin/python3
+
+# Copyright (c) 2021, Ciena Corporation.
+# All rights reserved.
+#
+# SPDX-License-Identifier: LGPL-2.1-only
+
+import json
+import os
+import subprocess
+import vci
+
+CONFIG_CACHE = '/run/vyatta/vyatta-gnssd.conf'
+
+current_config = dict()
+
+
+class Config(vci.Config):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        try:
+            with open(CONFIG_CACHE, 'r') as configcache:
+                config = json.load(configcache)
+                self.set(config)
+        except FileNotFoundError:
+            pass
+        except json.decoder.JSONDecodeError:
+            pass
+
+    def set(self, config):
+        global current_config
+        current_config = config
+        try:
+            with open(CONFIG_CACHE, 'w') as configcache:
+                json.dump(config, configcache)
+        except FileNotFoundError:
+            pass
+        except PermissionError:
+            pass
+        # Tell vyatta-gnssd to apply the new configuration
+        subprocess.run(['/usr/bin/killall', '-USR1', 'vyatta-gnssd'])
+
+    def check(self, config):
+        return
+
+    def get(self):
+        global current_config
+        return current_config
+
+
+class State(vci.State):
+    def get(self):
+        global current_config
+        return current_config
+
+
+def gnss_supported():
+    if os.path.exists('/run/vyatta/platform/ufi.s9500-30xs'):
+        return True
+
+    return False
+
+
+if __name__ == "__main__":
+    if gnss_supported():
+        component = vci.Component("net.vyatta.vci.service.gnss") \
+                           .model(vci.Model("net.vyatta.vci.service.gnss.v1")
+                                  .config(Config())
+                                  .state(State()))
+        component.run()
+        component.wait()
