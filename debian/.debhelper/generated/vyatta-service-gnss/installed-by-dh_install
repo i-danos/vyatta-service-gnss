@@ -1,6 +1,0 @@
-./debian/vyatta-gnssd.service
-./sbin/vyatta-gnssd
-./sbin/vyatta-gnssd-vci
-./bin/vyatta-gnss-op
-./bin/vyatta-gnss-util
-./lib/vyatta/gnss.py

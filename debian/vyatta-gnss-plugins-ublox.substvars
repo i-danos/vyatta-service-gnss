@@ -1,4 +1,0 @@
-python3:Depends=python3:any
-yang:Depends=
-misc:Depends=
-misc:Pre-Depends=

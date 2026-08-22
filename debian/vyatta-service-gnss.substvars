@@ -1,4 +1,0 @@
-python3:Depends=python3:any
-misc:Depends=deb-vci-helper
-yang:Depends=
-misc:Pre-Depends=
