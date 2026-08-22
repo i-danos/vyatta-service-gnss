@@ -1,0 +1,13 @@
+/tmp/
+/.debhelper/
+/files
+/*.substvars
+/*.debhelper.log
+/debhelper-build-stamp
+/autoreconf.*
+/vyatta-service-gnss/
+/vyatta-gnss-plugins-ublox/
+/vyatta-service-gnss-v1-yang/
+/vyatta-op-show-gnss-v1-yang/
+/vyatta-op-start-gnss-v1-yang/
+/vyatta-op-stop-gnss-v1-yang/
